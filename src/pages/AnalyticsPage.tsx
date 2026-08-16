@@ -119,7 +119,11 @@ export const AnalyticsPage: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
+                  <Tooltip 
+                    formatter={(value: number) => [formatCurrency(value), 'Amount']} 
+                    contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                    itemStyle={{ color: '#f8fafc' }}
+                  />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -136,7 +140,11 @@ export const AnalyticsPage: React.FC = () => {
               <BarChart data={comparisonData}>
                 <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
                 <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
+                <Tooltip 
+                  formatter={(value: number) => [formatCurrency(value), 'Amount']} 
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                  itemStyle={{ color: '#f8fafc' }}
+                />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
                   {comparisonData.map((entry, index) => (
                     <Cell key={`bar-${index}`} fill={entry.fill} />
@@ -156,10 +164,14 @@ export const AnalyticsPage: React.FC = () => {
               <BarChart data={walletDistribution} layout="vertical">
                 <XAxis type="number" stroke="#64748b" fontSize={12} />
                 <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={12} width={130} />
-                <Tooltip formatter={(value: number) => [formatCurrency(value), 'Balance']} />
+                <Tooltip 
+                  formatter={(value: number) => [formatCurrency(value), 'Balance']} 
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+                  itemStyle={{ color: '#f8fafc' }}
+                />
                 <Bar dataKey="balance" radius={[0, 8, 8, 0]}>
                   {walletDistribution.map((entry, index) => (
-                    <Cell key={`wcell-${index}`} fill={entry.fill || '#0f172a'} />
+                    <Cell key={`wcell-${index}`} fill={entry.fill || '#3b82f6'} />
                   ))}
                 </Bar>
               </BarChart>

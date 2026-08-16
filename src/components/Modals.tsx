@@ -187,6 +187,12 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const { wallets, categories, addTransaction, formatCurrency } = useApp();
 
   const [type, setType] = useState<TransactionType>(defaultType);
+
+  useEffect(() => {
+    if (isOpen) {
+      setType(defaultType);
+    }
+  }, [isOpen, defaultType]);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [walletId, setWalletId] = useState(wallets[0]?.id || '');
@@ -218,7 +224,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       type,
       walletId,
       toWalletId: type === 'transfer' ? toWalletId : undefined,
-      categoryId: type !== 'transfer' ? (categoryId || activeCategories[0]?.id) : undefined,
+      categoryId: type !== 'transfer' ? (categoryId || (type === 'income' ? 'cat_inc_other' : 'cat_exp_other')) : undefined,
       date,
       tags
     });

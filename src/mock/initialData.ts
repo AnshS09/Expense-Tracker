@@ -26,7 +26,7 @@ export const defaultCategories: Category[] = [
   { id: 'cat_exp_housing', name: 'Housing', type: 'expense', icon: 'home', color: '#6366f1', isCustom: false, isArchived: false },
   { id: 'cat_exp_travel', name: 'Travel', type: 'expense', icon: 'flight', color: '#14b8a6', isCustom: false, isArchived: false },
   { id: 'cat_exp_subscriptions', name: 'Subscriptions', type: 'expense', icon: 'subscriptions', color: '#f97316', isCustom: false, isArchived: false },
-  { id: 'cat_exp_other', name: 'Other', type: 'expense', icon: 'more_horiz', color: '#64748b', isCustom: false, isArchived: false },
+  { id: 'cat_exp_other', name: 'Miscellaneous', type: 'expense', icon: 'more_horiz', color: '#64748b', isCustom: false, isArchived: false },
 
   // Income Categories
   { id: 'cat_inc_salary', name: 'Salary', type: 'income', icon: 'work', color: '#10b981', isCustom: false, isArchived: false },
@@ -35,7 +35,7 @@ export const defaultCategories: Category[] = [
   { id: 'cat_inc_refund', name: 'Refund', type: 'income', icon: 'replay', color: '#06b6d4', isCustom: false, isArchived: false },
   { id: 'cat_inc_gift', name: 'Gift', type: 'income', icon: 'card_giftcard', color: '#ec4899', isCustom: false, isArchived: false },
   { id: 'cat_inc_investment', name: 'Investment Income', type: 'income', icon: 'trending_up', color: '#10b981', isCustom: false, isArchived: false },
-  { id: 'cat_inc_other', name: 'Other', type: 'income', icon: 'more_horiz', color: '#64748b', isCustom: false, isArchived: false },
+  { id: 'cat_inc_other', name: 'Miscellaneous', type: 'income', icon: 'more_horiz', color: '#64748b', isCustom: false, isArchived: false },
 ];
 
 export const initialWallets: Wallet[] = [];
