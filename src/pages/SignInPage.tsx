@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
 
 export const SignInPage: React.FC = () => {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await signInWithEmail(email, password);
+      } else {
+        await signUpWithEmail(email, password);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4">
@@ -14,15 +36,56 @@ export const SignInPage: React.FC = () => {
           </div>
           
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Welcome Back
+            {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mb-8">
-            Sign in to access your personal expense tracker and manage your finances effortlessly.
+            {isLogin ? 'Sign in to access your personal expense tracker.' : 'Sign up to start managing your finances effortlessly.'}
           </p>
 
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            {error && <div className="text-red-500 text-sm text-left">{error}</div>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center bg-blue-600 text-white rounded-xl px-6 py-4 font-semibold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+            >
+              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
+            </button>
+          </form>
+          
+          <div className="mt-6 text-sm text-slate-500 dark:text-slate-400 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-slate-300 dark:before:border-slate-600 before:mr-3 after:mt-0.5 after:flex-1 after:border-t after:border-slate-300 dark:after:border-slate-600 after:ml-3">
+            OR
+          </div>
+          
           <button
-            onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl px-6 py-4 font-semibold hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors shadow-sm"
+            onClick={async () => {
+              try {
+                await signInWithGoogle();
+              } catch (err: any) {
+                setError(err.message);
+              }
+            }}
+            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-xl px-6 py-4 mt-6 font-semibold hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -44,11 +107,16 @@ export const SignInPage: React.FC = () => {
             </svg>
             Continue with Google
           </button>
-        </div>
-        <div className="bg-slate-50 dark:bg-slate-800/50 p-6 text-center border-t border-slate-200 dark:border-slate-700">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
-          </p>
+          
+          <div className="mt-6 text-sm text-slate-500 dark:text-slate-400">
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <button 
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+            >
+              {isLogin ? 'Sign up' : 'Sign in'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

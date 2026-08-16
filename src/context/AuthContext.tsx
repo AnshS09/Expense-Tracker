@@ -5,6 +5,8 @@ import { supabase } from '../supabaseClient';
 interface AuthContextType {
   session: Session | null;
   user: User | null;
+  signInWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
@@ -35,12 +37,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  const signInWithEmail = async (email: string, pass: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
+    if (error) {
+      console.error('Error logging in:', error.message);
+      throw error;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, pass: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pass,
+    });
+    if (error) {
+      console.error('Error signing up:', error.message);
+      throw error;
+    }
+  };
+
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
     });
     if (error) {
       console.error('Error logging in with Google:', error.message);
+      throw error;
     }
   };
 
@@ -55,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signInWithGoogle, signOut, loading }}>
+    <AuthContext.Provider value={{ session, user, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
