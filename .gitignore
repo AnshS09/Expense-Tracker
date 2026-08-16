@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Production Build Artifacts
+dist/
+dist-ssr/
+*.local
+
+# IDE & Tooling
+.gemini/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosql
+*.sln
+*.swp
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+!.env.example
