@@ -83,11 +83,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return true; // Default to dark mode
   });
 
-  const { session } = useAuth();
+  const { session, loading } = useAuth();
 
   // Clear data when user logs out
   useEffect(() => {
-    if (!session) {
+    if (!loading && !session) {
       setUser(initialUser);
       setWallets(initialWallets);
       setCategories(defaultCategories);
@@ -102,7 +102,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.removeItem('fintrack_autopays');
       // Keep theme & categories
     }
-  }, [session]);
+  }, [session, loading]);
 
   // Sync state to local storage
   useEffect(() => { localStorage.setItem('fintrack_user', JSON.stringify(user)); }, [user]);
