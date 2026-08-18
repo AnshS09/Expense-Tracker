@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Currency } from '../types';
 
 export const SettingsPage: React.FC = () => {
-  const { user, updateUser, transactions, wallets, isDarkMode, toggleDarkMode } = useApp();
+  const { user, updateUser, transactions, wallets, isDarkMode, toggleDarkMode, resetTransactionHistory } = useApp();
+  const navigate = useNavigate();
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const curr = e.target.value as Currency;
@@ -53,9 +55,16 @@ export const SettingsPage: React.FC = () => {
   };
 
   const handleResetData = () => {
-    if (confirm('Are you sure you want to reset all local data? This will restore default demo state.')) {
-      localStorage.clear();
-      window.location.reload();
+    if (confirm('Are you sure you want to delete your entire transaction history?\n\nThis will permanently remove all recorded transactions.\nYour wallet balances will remain unchanged.')) {
+      resetTransactionHistory();
+    }
+  };
+
+  const handleRestartOnboarding = () => {
+    if (confirm('⚠️ WARNING: Restarting onboarding will DELETE your entire transaction history.\n\nYour wallet balances will be preserved, but all transaction records will be permanently removed.\n\nAre you sure you want to continue?')) {
+      resetTransactionHistory();
+      updateUser({ isOnboarded: false });
+      navigate('/onboarding');
     }
   };
 
@@ -159,34 +168,35 @@ export const SettingsPage: React.FC = () => {
 
         {/* Danger Zone */}
         <div className="pt-4 border-t border-outline-variant/60 dark:border-slate-800 space-y-4">
-          <h4 className="text-xs font-bold text-expense uppercase tracking-wider">Account Reset & Onboarding</h4>
+          <h4 className="text-xs font-bold text-expense uppercase tracking-wider">Danger Zone</h4>
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+          {/* Onboarding - RED styling with warning */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-expense/5 dark:bg-red-950/30 p-4 rounded-xl border border-expense/20 dark:border-red-900/40">
             <div>
-              <h5 className="text-sm font-bold text-slate-900 dark:text-slate-200">Re-run Onboarding Wizard</h5>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Re-configure your professional profile, primary currency, and wallets setup.</p>
+              <h5 className="text-sm font-bold text-expense">Re-run Onboarding Wizard</h5>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400">
+                ⚠️ This will <strong className="text-expense">delete your transaction history</strong> and re-configure your profile, currency, and wallets.
+              </p>
             </div>
             <button
-              onClick={() => {
-                updateUser({ isOnboarded: false });
-                window.location.href = '/onboarding';
-              }}
-              className="px-4 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white text-xs font-bold rounded-xl transition-colors shadow-sm shrink-0"
+              onClick={handleRestartOnboarding}
+              className="px-4 py-2 bg-expense hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-colors shadow-sm shrink-0"
             >
-              Start Onboarding
+              Restart Onboarding
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-expense/5 p-4 rounded-xl border border-expense/20">
+          {/* Reset Data - transactions only */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-expense/5 dark:bg-red-950/30 p-4 rounded-xl border border-expense/20 dark:border-red-900/40">
             <div>
-              <h5 className="text-sm font-bold text-expense">Reset Local Account Data</h5>
-              <p className="text-xs text-on-surface-variant dark:text-slate-400">Clears all locally stored transactions and restores factory demo state.</p>
+              <h5 className="text-sm font-bold text-expense">Clear Transaction History</h5>
+              <p className="text-xs text-on-surface-variant dark:text-slate-400">Permanently deletes all recorded transactions. Wallet balances remain unchanged.</p>
             </div>
             <button
               onClick={handleResetData}
               className="px-4 py-2 bg-expense text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-colors shadow-sm shrink-0"
             >
-              Reset Data
+              Reset Transactions
             </button>
           </div>
         </div>

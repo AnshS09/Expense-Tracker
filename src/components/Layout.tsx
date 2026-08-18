@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAddModal }) => {
         </button>
 
         {/* Navigation Items */}
-        <ul className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
+        <ul className="flex flex-col gap-1.5 flex-1 overflow-y-auto scrollbar-hide">
           {navItems.map((item) => (
             <li key={item.path}>
               <NavLink
@@ -60,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAddModal }) => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all active:scale-95 duration-200 ${
                     isActive
-                      ? 'text-primary dark:text-slate-100 font-bold bg-surface-container-low dark:bg-[#151c28] border-r-4 border-primary dark:border-slate-100 shadow-sm'
+                      ? 'text-primary dark:text-slate-100 font-bold bg-surface-container-low dark:bg-[#151c28] border-l-4 border-primary dark:border-slate-100 shadow-sm'
                       : 'text-on-secondary-container dark:text-slate-400 hover:bg-surface-container-low dark:hover:bg-[#151c28]/60 hover:text-on-surface dark:hover:text-slate-200'
                   }`
                 }

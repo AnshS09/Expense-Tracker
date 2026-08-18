@@ -78,11 +78,11 @@ export const LoansDuesPage: React.FC = () => {
 
       {/* Tabs */}
       <div className="bg-white dark:bg-[#151c28] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div className="flex p-1 bg-surface-container-low rounded-xl border border-outline-variant max-w-md">
+        <div className="flex p-1 bg-surface-container-low dark:bg-slate-900 rounded-xl border border-outline-variant dark:border-slate-700/60 max-w-md">
           <button
             onClick={() => setActiveTab('OWED_TO_ME')}
             className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'OWED_TO_ME' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+              activeTab === 'OWED_TO_ME' ? 'bg-primary dark:bg-slate-100 text-on-primary dark:text-slate-900 shadow-sm' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200'
             }`}
           >
             Owed To Me ({loansDues.filter(l => l.type === 'OWED_TO_ME').length})
@@ -90,7 +90,7 @@ export const LoansDuesPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('OWED_BY_ME')}
             className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'OWED_BY_ME' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+              activeTab === 'OWED_BY_ME' ? 'bg-primary dark:bg-slate-100 text-on-primary dark:text-slate-900 shadow-sm' : 'text-on-surface-variant dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200'
             }`}
           >
             Money I Owe ({loansDues.filter(l => l.type === 'OWED_BY_ME').length})
@@ -100,7 +100,7 @@ export const LoansDuesPage: React.FC = () => {
         {/* List Feed */}
         <div className="space-y-4 pt-2">
           {filteredLoans.length === 0 ? (
-            <div className="text-center py-10 text-on-surface-variant text-xs font-semibold">
+            <div className="text-center py-10 text-on-surface-variant dark:text-slate-400 text-xs font-semibold">
               No entries recorded under this category.
             </div>
           ) : (
@@ -109,27 +109,27 @@ export const LoansDuesPage: React.FC = () => {
               const percentPaid = Math.min(100, Math.round((loan.paidAmount / loan.totalAmount) * 100));
 
               return (
-                <div key={loan.id} className="p-5 rounded-xl border border-outline-variant bg-surface-container-low/30 space-y-3">
+                <div key={loan.id} className="p-5 rounded-xl border border-outline-variant dark:border-slate-700/60 bg-surface-container-low/30 dark:bg-slate-800/40 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-on-surface">{loan.title}</h3>
+                        <h3 className="text-base font-bold text-on-surface dark:text-slate-100">{loan.title}</h3>
                         <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
                           loan.status === 'SETTLED' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                         }`}>
                           {loan.status}
                         </span>
                       </div>
-                      <p className="text-xs text-on-surface-variant">
-                        Person: <strong className="text-on-surface">{loan.personName}</strong> • Due: {loan.dueDate}
+                      <p className="text-xs text-on-surface-variant dark:text-slate-400">
+                        Person: <strong className="text-on-surface dark:text-slate-200">{loan.personName}</strong> • Due: {loan.dueDate}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-lg font-bold text-primary tabular-nums block">
+                      <span className="text-lg font-bold text-primary dark:text-slate-100 tabular-nums block">
                         {formatCurrency(remaining)} Left
                       </span>
-                      <span className="text-xs text-on-surface-variant">
+                      <span className="text-xs text-on-surface-variant dark:text-slate-400">
                         Total: {formatCurrency(loan.totalAmount)}
                       </span>
                     </div>
@@ -137,18 +137,18 @@ export const LoansDuesPage: React.FC = () => {
 
                   {/* Progress Bar */}
                   <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-semibold text-on-surface-variant">
+                    <div className="flex justify-between text-[11px] font-semibold text-on-surface-variant dark:text-slate-400">
                       <span>Paid: {formatCurrency(loan.paidAmount)} ({percentPaid}%)</span>
                       <span>Total: {formatCurrency(loan.totalAmount)}</span>
                     </div>
-                    <div className="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
-                      <div className="h-full bg-primary transition-all duration-300" style={{ width: `${percentPaid}%` }} />
+                    <div className="w-full h-2 bg-surface-container-high dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary dark:bg-emerald-500 transition-all duration-300" style={{ width: `${percentPaid}%` }} />
                     </div>
                   </div>
 
                   {/* Repayments History & Actions */}
-                  <div className="pt-2 flex items-center justify-between border-t border-outline-variant/60">
-                    <span className="text-xs text-on-surface-variant font-medium">
+                  <div className="pt-2 flex items-center justify-between border-t border-outline-variant/60 dark:border-slate-700/60">
+                    <span className="text-xs text-on-surface-variant dark:text-slate-400 font-medium">
                       {loan.repayments.length} repayment record(s)
                     </span>
 
@@ -156,13 +156,13 @@ export const LoansDuesPage: React.FC = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setSelectedLoanForRepayment(loan)}
-                          className="px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg transition-colors"
+                          className="px-3 py-1.5 bg-surface-container-high dark:bg-slate-700 hover:bg-surface-container-highest dark:hover:bg-slate-600 text-on-surface dark:text-slate-200 text-xs font-bold rounded-lg transition-colors"
                         >
                           Partial Repayment
                         </button>
                         <button
                           onClick={() => settleLoanDue(loan.id)}
-                          className="px-3 py-1.5 bg-primary text-on-primary text-xs font-bold rounded-lg hover:bg-slate-800 transition-colors"
+                          className="px-3 py-1.5 bg-primary dark:bg-slate-100 text-on-primary dark:text-slate-900 text-xs font-bold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-300 transition-colors"
                         >
                           Settle In Full
                         </button>
@@ -186,12 +186,12 @@ export const LoansDuesPage: React.FC = () => {
       {/* Add Loan Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Record New Loan or Due">
         <form onSubmit={handleAddSubmit} className="space-y-4">
-          <div className="flex p-1 bg-surface-container-low rounded-xl border border-outline-variant">
+          <div className="flex p-1 bg-surface-container-low dark:bg-slate-900 rounded-xl border border-outline-variant dark:border-slate-700/60">
             <button
               type="button"
               onClick={() => setType('OWED_TO_ME')}
               className={`flex-1 py-2 rounded-lg text-xs font-bold ${
-                type === 'OWED_TO_ME' ? 'bg-success text-white' : 'text-on-surface-variant'
+                type === 'OWED_TO_ME' ? 'bg-success text-white' : 'text-on-surface-variant dark:text-slate-400'
               }`}
             >
               Money Owed To Me
@@ -200,7 +200,7 @@ export const LoansDuesPage: React.FC = () => {
               type="button"
               onClick={() => setType('OWED_BY_ME')}
               className={`flex-1 py-2 rounded-lg text-xs font-bold ${
-                type === 'OWED_BY_ME' ? 'bg-expense text-white' : 'text-on-surface-variant'
+                type === 'OWED_BY_ME' ? 'bg-expense text-white' : 'text-on-surface-variant dark:text-slate-400'
               }`}
             >
               Money I Owe
@@ -208,32 +208,32 @@ export const LoansDuesPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-on-surface-variant uppercase mb-1">Title / Purpose</label>
+            <label className="block text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase mb-1">Title / Purpose</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Dinner Bill Split, Textbook Borrowing"
-              className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-2.5 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant dark:border-slate-700/60 rounded-xl py-2.5 px-4 text-sm text-on-surface dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-on-surface-variant uppercase mb-1">Person Name</label>
+            <label className="block text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase mb-1">Person Name</label>
             <input
               type="text"
               required
               value={personName}
               onChange={(e) => setPersonName(e.target.value)}
               placeholder="e.g. Rohan Sharma"
-              className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-2.5 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant dark:border-slate-700/60 rounded-xl py-2.5 px-4 text-sm text-on-surface dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-on-surface-variant uppercase mb-1">Total Amount</label>
+              <label className="block text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase mb-1">Total Amount</label>
               <input
                 type="number"
                 step="0.01"
@@ -241,17 +241,17 @@ export const LoansDuesPage: React.FC = () => {
                 value={totalAmount}
                 onChange={(e) => setTotalAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-2.5 px-4 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary focus:outline-none tabular-nums"
+                className="w-full bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant dark:border-slate-700/60 rounded-xl py-2.5 px-4 text-sm font-bold text-on-surface dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none tabular-nums"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-on-surface-variant uppercase mb-1">Expected Due Date</label>
+              <label className="block text-xs font-semibold text-on-surface-variant dark:text-slate-400 uppercase mb-1">Expected Due Date</label>
               <input
                 type="date"
                 required
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-2.5 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full bg-surface-container-lowest dark:bg-slate-900 border border-outline-variant dark:border-slate-700/60 rounded-xl py-2.5 px-4 text-sm text-on-surface dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none"
               />
             </div>
           </div>
@@ -259,7 +259,7 @@ export const LoansDuesPage: React.FC = () => {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full bg-primary text-on-primary py-3 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-md"
+              className="w-full bg-primary dark:bg-slate-100 text-on-primary dark:text-slate-900 py-3 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-slate-300 transition-all shadow-md"
             >
               Save Loan / Due Record
             </button>

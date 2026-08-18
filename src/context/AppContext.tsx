@@ -24,6 +24,7 @@ interface AppContextType {
   // Transactions (Immutable History Engine)
   transactions: Transaction[];
   addTransaction: (tx: Omit<Transaction, 'id' | 'source' | 'status'>) => void;
+  resetTransactionHistory: () => void;
 
   // Loans & Dues
   loansDues: LoanDue[];
@@ -220,6 +221,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const resetTransactionHistory = () => {
+    setTransactions([]);
+  };
+
   const addLoanDue = (item: Omit<LoanDue, 'id' | 'paidAmount' | 'status' | 'repayments'>) => {
     const newLoan: LoanDue = {
       ...item,
@@ -344,7 +349,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       user, updateUser, completeOnboarding,
       wallets, addWallet, updateWallet, adjustWalletBalance, archiveWallet, restoreWallet,
       categories, addCategory, archiveCategory,
-      transactions, addTransaction,
+      transactions, addTransaction, resetTransactionHistory,
       loansDues, addLoanDue, logRepayment, settleLoanDue,
       autopays, addAutopay, confirmAutopay,
       isDarkMode, toggleDarkMode,
