@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '../supabaseClient';
 import { UserProfile, Wallet, Category, Transaction, LoanDue, Autopay } from '../types';
 import { initialUser, initialWallets, defaultCategories, initialTransactions, initialLoansDues, initialAutopays } from '../mock/initialData';
 
@@ -85,6 +86,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const { session, loading } = useAuth();
+  const [initialDataFetched, setInitialDataFetched] = useState(false);
+  const [isCloudSyncing, setIsCloudSyncing] = useState(false);
 
   // Clear data when user logs out
   useEffect(() => {
@@ -102,8 +105,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.removeItem('fintrack_loans');
       localStorage.removeItem('fintrack_autopays');
       // Keep theme & categories
+      setInitialDataFetched(false);
     }
   }, [session, loading]);
+
+  // Load data from Supabase on login
+  useEffect(() => {
+    if (!loading && session && !initialDataFetched) {
+      const loadData = async () => {
+        setIsCloudSyncing(true);
+        try {
+          const { data, error } = await supabase
+            .from('user_data')
+            .select('data')
+            .eq('user_id', session.user.id)
+            .single();
+
+          if (error && error.code !== 'PGRST116') {
+             console.error("Supabase fetch error:", error);
+          }
+
+          if (data && data.data) {
+            const d = data.data as any;
+            if (d.user) setUser(d.user);
+            if (d.wallets) setWallets(d.wallets);
+            if (d.categories) setCategories(d.categories);
+            if (d.transactions) setTransactions(d.transactions);
+            if (d.loansDues) setLoansDues(d.loansDues);
+            if (d.autopays) setAutopays(d.autopays);
+          }
+        } catch (err) {
+          console.error("Error loading cloud data:", err);
+        } finally {
+          setInitialDataFetched(true);
+          setIsCloudSyncing(false);
+        }
+      };
+      loadData();
+    }
+  }, [session, loading, initialDataFetched]);
 
   // Sync state to local storage
   useEffect(() => { localStorage.setItem('fintrack_user', JSON.stringify(user)); }, [user]);
@@ -113,6 +153,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => { localStorage.setItem('fintrack_loans', JSON.stringify(loansDues)); }, [loansDues]);
   useEffect(() => { localStorage.setItem('fintrack_autopays', JSON.stringify(autopays)); }, [autopays]);
   
+  // Sync state to Supabase
+  useEffect(() => {
+    if (session && initialDataFetched) {
+      const timer = setTimeout(async () => {
+        setIsCloudSyncing(true);
+        try {
+          const payload = {
+            user,
+            wallets,
+            categories,
+            transactions,
+            loansDues,
+            autopays
+          };
+          const { error } = await supabase
+            .from('user_data')
+            .upsert({
+              user_id: session.user.id,
+              data: payload,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+            
+          if (error) {
+            console.error('Error syncing to Supabase:', error.message);
+          }
+        } catch (err) {
+          console.error('Failed to sync to Supabase', err);
+        } finally {
+          setIsCloudSyncing(false);
+        }
+      }, 2000); // Debounce syncs by 2 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [user, wallets, categories, transactions, loansDues, autopays, session, initialDataFetched]);
+
   useEffect(() => {
     localStorage.setItem('fintrack_theme', isDarkMode ? 'dark' : 'light');
     const root = document.documentElement;
