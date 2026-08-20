@@ -20,18 +20,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session — this is the authoritative source for the first load.
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for changes
+    // Listen for subsequent changes (sign-in, sign-out, token refresh).
+    // Do NOT set loading here — onAuthStateChange fires synchronously on setup
+    // with INITIAL_SESSION before getSession resolves, which can cause a flash
+    // of the sign-in page for already-authenticated users.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
