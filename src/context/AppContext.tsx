@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../supabaseClient';
 import { UserProfile, Wallet, Category, Transaction, LoanDue, Autopay } from '../types';
@@ -88,6 +88,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { session, loading } = useAuth();
   const [initialDataFetched, setInitialDataFetched] = useState(false);
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
+  // Tracks the timestamp of the last upload this device initiated.
+  // When a realtime event arrives, we compare its updated_at with this
+  // timestamp to decide if it was our own echo or a remote change.
+  const lastUploadTimestampRef = useRef<string>('');
 
   // Clear data when user logs out
   useEffect(() => {
@@ -145,6 +149,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [session, loading, initialDataFetched]);
 
+  // Realtime subscription
+  useEffect(() => {
+    if (!session || !initialDataFetched) return;
+
+    // We only want to listen to changes for this specific user's row
+    const channel = supabase
+      .channel(`user_data_changes_${session.user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT and UPDATE
+          schema: 'public',
+          table: 'user_data',
+          filter: `user_id=eq.${session.user.id}`,
+        },
+        (payload) => {
+          // Payload contains the new row data
+          const newData = payload.new as any;
+          if (newData && newData.data) {
+            // If this event's updated_at matches our last upload, it's our own echo — skip it.
+            if (newData.updated_at && newData.updated_at === lastUploadTimestampRef.current) {
+              return;
+            }
+
+            const d = newData.data;
+            // Update local state with incoming remote data
+            if (d.user) setUser(d.user);
+            if (d.wallets) setWallets(d.wallets);
+            if (d.categories) setCategories(d.categories);
+            if (d.transactions) setTransactions(d.transactions);
+            if (d.loansDues) setLoansDues(d.loansDues);
+            if (d.autopays) setAutopays(d.autopays);
+            
+            // Mark that these state updates came from a remote device
+            // so the debounced upload effect skips this cycle.
+            lastUploadTimestampRef.current = newData.updated_at || '';
+            
+            // Note: localStorage is updated automatically by the existing useEffects
+          }
+        }
+      )
+      .subscribe((status, err) => {
+        if (err) {
+          console.error("Supabase Realtime subscription error:", err);
+        }
+      });
+
+    // Cleanup subscription on unmount or session change
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session, initialDataFetched]);
+
   // Sync state to local storage
   useEffect(() => { localStorage.setItem('fintrack_user', JSON.stringify(user)); }, [user]);
   useEffect(() => { localStorage.setItem('fintrack_wallets', JSON.stringify(wallets)); }, [wallets]);
@@ -167,16 +224,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             loansDues,
             autopays
           };
+          const uploadTimestamp = new Date().toISOString();
           const { error } = await supabase
             .from('user_data')
             .upsert({
               user_id: session.user.id,
               data: payload,
-              updated_at: new Date().toISOString()
+              updated_at: uploadTimestamp
             }, { onConflict: 'user_id' });
             
           if (error) {
             console.error('Error syncing to Supabase:', error.message);
+          } else {
+            // Remember this timestamp so we can identify our own echo
+            lastUploadTimestampRef.current = uploadTimestamp;
           }
         } catch (err) {
           console.error('Failed to sync to Supabase', err);
@@ -299,6 +360,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetTransactionHistory = () => {
     setTransactions([]);
+    setLoansDues([]);
+    setAutopays([]);
   };
 
   const addLoanDue = (item: Omit<LoanDue, 'id' | 'paidAmount' | 'status' | 'repayments'>) => {

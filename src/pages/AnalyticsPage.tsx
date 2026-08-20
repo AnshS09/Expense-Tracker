@@ -142,7 +142,7 @@ export const AnalyticsPage: React.FC = () => {
                 <YAxis stroke="#94a3b8" fontSize={12} tick={{ fill: '#94a3b8' }} />
                 <Tooltip
                   formatter={(value: number) => [formatCurrency(value), 'Amount']}
-                  contentStyle={{ backgroundColor: '#427ad4ff', borderColor: '#334155', color: '#f8fafc' }}
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
                   itemStyle={{ color: '#f8fafc' }}
                 />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
@@ -171,7 +171,7 @@ export const AnalyticsPage: React.FC = () => {
                 />
                 <Bar dataKey="balance" radius={[0, 8, 8, 0]}>
                   {walletDistribution.map((entry, index) => (
-                    <Cell key={`wcell-${index}`} fill={entry.fill || '#bef63bff'} />
+                    <Cell key={`wcell-${index}`} fill={entry.fill || '#3b82f6'} />
                   ))}
                 </Bar>
               </BarChart>

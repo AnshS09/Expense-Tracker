@@ -55,7 +55,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   const handleResetData = () => {
-    if (confirm('Are you sure you want to delete your entire transaction history?\n\nThis will permanently remove all recorded transactions.\nYour wallet balances will remain unchanged.')) {
+    if (confirm('Are you sure you want to delete all your data?\n\nThis will permanently remove all recorded transactions, loans & dues, and autopays.\nYour wallet balances will remain unchanged.')) {
       resetTransactionHistory();
     }
   };
