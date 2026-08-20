@@ -20,23 +20,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session — this is the authoritative source for the first load.
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Debug: check what's in localStorage at mount time
+    const storageKeys = Object.keys(localStorage).filter(k => k.startsWith('sb-'));
+    console.log('[Auth] Mount - Supabase keys in localStorage:', storageKeys);
+    console.log('[Auth] Mount - URL hash:', window.location.hash ? 'present' : 'none');
+
+    // Set up the auth state listener FIRST (Supabase v2 recommended pattern).
+    // This fires INITIAL_SESSION synchronously with any persisted session.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[Auth] onAuthStateChange:', event, session ? 'session exists' : 'no session');
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+
+      if (event === 'INITIAL_SESSION') {
+        setLoading(false);
+      }
     });
 
-    // Listen for subsequent changes (sign-in, sign-out, token refresh).
-    // Do NOT set loading here — onAuthStateChange fires synchronously on setup
-    // with INITIAL_SESSION before getSession resolves, which can cause a flash
-    // of the sign-in page for already-authenticated users.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    // Fallback: if INITIAL_SESSION didn't fire (edge case), resolve loading via getSession
+    const fallbackTimer = setTimeout(() => {
+      setLoading(prev => {
+        if (prev) {
+          console.log('[Auth] Fallback: loading was still true, resolving via getSession');
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log('[Auth] getSession fallback:', session ? 'session exists' : 'no session');
+            setSession(session);
+            setUser(session?.user ?? null);
+            setLoading(false);
+          });
+        }
+        return prev;
+      });
+    }, 1000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   const signInWithEmail = async (email: string, pass: string) => {
