@@ -32,6 +32,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
 
+      if (session) {
+        // Clear OAuth hash/code from the URL so it isn't bookmarked or reused.
+        // Re-using a ?code= or #access_token= in a new tab causes session reset.
+        if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
+          const newUrl = window.location.pathname; // strip both search and hash
+          window.history.replaceState(null, '', newUrl);
+        }
+      }
+
       if (event === 'INITIAL_SESSION') {
         setLoading(false);
       }
